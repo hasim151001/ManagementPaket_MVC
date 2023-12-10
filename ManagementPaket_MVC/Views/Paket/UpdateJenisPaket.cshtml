@@ -1,0 +1,95 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+}
+<style>
+    #map-container {
+        position: relative;
+    }
+
+    .marker {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background-color: red;
+        border-radius: 50%;
+        cursor: pointer;
+        user-select: none;
+    }
+</style>
+<div class="card">
+    <div class="card-header" style="background-color: #4285f4; color: white;">
+        <h5 style="margin: 0;">
+            Update Jenis Paket
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <label style="font-weight: bold;">Nama Jenis Paket<b style="color: red">*</b></label><br>
+            <span id="MainContent_reqAddSender" class="validator" style="display:none;">&nbsp;<i class="fas fa-exclamation-circle"></i></span>
+            <input type="hidden" class="form-control" name="pak_id_jenis" id="pak_id_jenis" value="@ViewBag.pak_id_jenis" />
+            <input class="form-control" name="pak_nama_jenis" id="pak_nama_jenis" maxlength="25" />
+            <div class="mb-3"></div>
+        </div>
+
+
+        <div class="float-right" style="margin-bottom: 15px;">
+            <a id="MainContent_linkCancelAdd" class="btn btn-secondary" asp-action="Index">Batal</a>
+            <button type="button" class="btn btn-primary" onclick="simpan()">Simpan</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    loadData();
+
+    function loadData() {
+        var pak_id_jenis = document.getElementById("pak_id_jenis")
+        var pak_nama_jenis = document.getElementById("pak_nama_jenis")
+
+        var hostname = "https://localhost:7120/"
+        var url = hostname + "GetJenisPaket?pak_id_jenis=" + pak_id_jenis.value
+        var method = "GET"
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: "application/json",
+            success: function (data) {
+                var item = data.data
+                pak_nama_jenis.value = item.pak_nama_jenis // Assuming pak_nama_jenis is the correct property name
+            },
+        });
+    }
+
+
+
+    function simpan() {
+        var pak_id_jenis = document.getElementById("pak_id_jenis").value
+        var pak_nama_jenis = document.getElementById("pak_nama_jenis").value
+
+        var hostname = "https://localhost:7120/"
+        var url = hostname + "UpdateJenisPaket"
+        var method = "PUT"
+        var input = {
+            pak_id_jenis: pak_id_jenis,
+            pak_nama_jenis: pak_nama_jenis,
+
+        }
+        var data = JSON.stringify(input)
+
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            contentType: "application/json",
+            success: function (data) {
+                alert("Data Berhasil Diupdate")
+                window.location.href = '/JenisPaket/Index';
+
+            },
+        });
+    }
+</script>

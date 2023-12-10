@@ -1,0 +1,75 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+}
+<style>
+    #map-container {
+        position: relative;
+    }
+
+    .marker {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background-color: red;
+        border-radius: 50%;
+        cursor: pointer;
+        user-select: none;
+    }
+</style>
+<div class="card">
+    <div class="card-header" style="background-color: #4285f4; color: white;">
+        <h5 style="margin: 0;">
+            Tambah Jenis Paket Baru
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <label style="font-weight: bold;" for="pak_nama_jenis">Nama Jenis Paket<b style="color: red">*</b></label><br>
+            <span id="MainContent_reqAddSender" class="validator" style="display:none;">&nbsp;<i class="fas fa-exclamation-circle"></i></span>
+            <input type="text" class="form-control" name="pak_nama_jenis" id="pak_nama_jenis" maxlength="25" style="display: inline;">
+            <div class="mb-3"></div>
+        </div>
+
+        <div class="float-right" style="margin-bottom: 15px;">
+            <a id="MainContent_linkCancelAdd" class="btn btn-secondary" asp-action="Index">Batal</a>
+            <button type="button" class="btn btn-primary" onclick="simpan()">Simpan</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function simpan() {
+        var pak_nama_jenis = document.getElementById("pak_nama_jenis").value;
+
+        var hostname = "https://localhost:7120/";
+        var url = hostname + "InsertJenisPaket?pak_nama_jenis=" + encodeURIComponent(pak_nama_jenis);
+        var method = "POST";
+
+        console.log(url);
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: "application/json",
+            success: function (response) {
+                if (response.status == 200) {
+                    alert("Data Berhasil Ditambahkan");
+                    // Redirect to the index page of the current controller
+                    window.location.href = '/JenisPaket/Index';
+                } else {
+                    alert("Gagal menambahkan data. Cek konsol untuk detailnya.");
+                    console.error(response);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Terjadi kesalahan. Cek konsol untuk detailnya.");
+                console.error(xhr);
+            }
+        });
+    }
+
+
+</script>

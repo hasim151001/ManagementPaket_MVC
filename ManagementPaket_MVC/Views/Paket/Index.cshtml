@@ -1,0 +1,393 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="scrollstyle" style="overflow-y: auto; height: 100%; padding-right: 15px;">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb" style="padding: 0; margin: 0; background-color: #FFF;">
+            <li class="breadcrumb-item text-primary">
+                <b>
+                    Sistem Pengelolaan Paket
+                </b>
+            </li>
+            <li class="breadcrumb-item active"><b>Kelola Paket</b></li>
+        </ol>
+    </nav>
+    <hr style="margin-top: .8em;">
+
+    <input type="file" name="ctl00$MainContent$file" id="file" onchange="cekImage(this);" style="display: none;">
+
+    <div id="MainContent_panelData" onkeypress="javascript:return jenisPaketForm(event, 'MainContent_linkCari')">
+
+        <div class="md-form input-group mb-4 " style="margin-top: 0px; margin-bottom: 15px !important;">
+            <a class="btn btn-primary rounded-pill waves-effect waves-light" data-toggle="modal" data-target="#createModal" style="padding: 10px 30px;"><i class="fas fa-plus"></i></a>
+            <input name="ctl00$MainContent$txtCari" type="text" id="MainContent_txtCari" class="form-control form-cari" placeholder="Cari" />
+            @* <a id="MainContent_linkCari" class="btn btn-primary btn-rounded waves-effect waves-light rounded-pill" href="javascript:__doPostBack(&#39;ctl00$MainContent$linkCari&#39;,&#39;&#39;)" style="padding: 10px 30px;"><i class="fas fa-search"></i></a> *@
+        </div>
+        <div class="container">
+            <div class="scrollstyle" style="overflow-x: auto;">
+                <div>
+                    <table class="table table-sm table-hover table-bordered table-striped" cellspacing="0" rules="all" border="1" id="MainContent_gridData" style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">ID  Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Pemilik Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Jenis Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Tanggal Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Pengirim Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Status Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Create Paket -->
+        <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true" data-backdrop="false">
+            <!-- Isi modal di sini -->
+            <div class="modal-dialog modal-dialog-centered modal-dialog-bottom" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">Tambah Paket</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Isi form create Paket di sini -->
+                        <form id="createForm">
+                            <div class="card-body">
+
+                                <div class="form-group">
+                                    <label style="font-weight: bold;" for="pak_nama_pemilik">Nama Pemilik Paket<b style="color: red">*</b></label><br>
+                                    <input type="text" class="form-control" name="pak_nama_pemilik" id="pak_nama_pemilik" maxlength="255" style="display: inline;">
+                                    <div class="mb-3"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="font-weight: bold;" for="pak_id_jenis">ID Jenis Paket<b style="color: red">*</b></label><br>
+                                    <select class="form-control" name="pak_id_jenis" id="pak_id_jenis" style="display: inline;">
+                                    </select>
+                                    <div class="mb-3"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="font-weight: bold;" for="pak_nama_pengirim">Nama Pengirim Paket<b style="color: red">*</b></label><br>
+                                    <input type="text" class="form-control" name="pak_nama_pengirim" id="pak_nama_pengirim" maxlength="255" style="display: inline;">
+                                    <div class="mb-3"></div>
+                                </div>
+
+
+                                <div class="float-right" style="margin-bottom: 15px;">
+                                    <a id="MainContent_linkCancelAdd" class="btn btn-secondary" asp-action="Index">Batal</a>
+                                    <button type="button" class="btn btn-primary" onclick="simpan()">Simpan</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Update Paket -->
+        <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateModalLabel">Update Paket</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateForm">
+                            <!-- Input untuk pak_id (hidden) -->
+                            <input type="hidden" class="form-control" id="updatePakId" maxlength="10" style="display: inline;">
+
+                            <div class="form-group">
+                                <label for="update_pak_nama_pemilik" style="font-weight: bold;">Nama Pemilik Paket<b style="color: red">*</b></label>
+                                <input type="text" class="form-control" id="updatePakNamaPemilik" maxlength="255" style="display: inline;">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="update_pak_id_jenis" style="font-weight: bold;">ID Jenis Paket<b style="color: red">*</b></label>
+                                <select class="form-control" id="updatePakIdJenis" style="display: inline;">
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="update_pak_nama_pengirim" style="font-weight: bold;">Nama Pengirim Paket<b style="color: red">*</b></label>
+                                <input type="text" class="form-control" id="updatePakNamaPengirim" maxlength="255" style="display: inline;">
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-primary" onclick="Edit()">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal untuk Detail Informasi Paket -->
+        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailModalLabel">Detail Paket</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>ID Paket:</strong> <span id="detailPakId"></span></p>
+                        <p><strong>Nama Pemilik Paket:</strong> <span id="detailPakNamaPemilik"></span></p>
+                        <p><strong>ID Jenis Paket:</strong> <span id="detailPakIdJenis"></span></p>
+                        <p><strong>Tanggal Sampai:</strong> <span id="detailPakTanggal"></span></p>
+                        <p><strong>Nama Pengirim Paket:</strong> <span id="detailPakNamaPengirim"></span></p>
+                        <p><strong>Status Paket:</strong> <span id="detailPakStatus"></span></p>
+                        <!-- Tambahkan informasi lainnya sesuai kebutuhan -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+        <script>
+            loadTable();
+            function showUpdateModal(id, namaPemilik, idJenis, tanggalPaket, namaPengirim, status) {
+                // Menetapkan nilai input modal update
+                $('#updatePakId').val(id);
+                $('#updatePakNamaPemilik').val(namaPemilik);
+                $('#updatePakIdJenis').val(idJenis);
+                $('#updatePakTanggalSampai').val(tanggalPaket);
+                $('#updatePakNamaPengirim').val(namaPengirim);
+                $('#updatePakStatus').val(status);
+
+                // Memanggil fungsi untuk mengisi dropdown list
+                populateJenisPaketDropdown();  // Pastikan panggilan ini dijalankan pada waktu yang tepat
+                // Menampilkan modal update
+                $('#updateModal').modal('show');
+            }
+
+
+
+            function loadTable() {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetAllPaket";
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var paketList = data.data;
+
+                        $('#tbody').empty();
+
+                        paketList.forEach(function (item) {
+                            var newRow = "<tr>" +
+                                "<td class='text-center'>" + item.pak_id + "</td>" +
+                                "<td>" + item.pak_nama_pemilik + "</td>" +
+                                "<td class='text-center'>" + item.pak_id_jenis + "</td>" +
+                                "<td>" + item.pak_tanggal_sampai + "</td>" +
+                                "<td>" + item.pak_nama_pengirim + "</td>" +
+                                "<td>" + item.pak_status + "</td>" +
+                                "<td class='text-center'>" +
+                                "<a data-toggle='modal' data-target='#updateModal' data-backdrop='false' " +
+                                "onclick='showUpdateModal(\"" + item.pak_id + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_id_jenis + "\", " +
+                                "\"" + item.pak_tanggal_sampai + "\", \"" + item.pak_nama_pengirim + "\", \"" + item.pak_status + "\")'>" +
+                                "<i class='fas fa-edit'></i></a>" +
+                                "&nbsp;&nbsp;&nbsp;" +
+                                "<a href='#' class='delete-btn' data-pak-id='" + item.pak_id + "'><i class='fas fa-trash'></i></a>" +
+                                "&nbsp;&nbsp;&nbsp;" +
+                                "<a data-toggle='modal' data-target='#detailModal' data-backdrop='false' " +
+                                "onclick='showDetail(\"" + item.pak_id + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_id_jenis + "\", " +
+                                "\"" + item.pak_tanggal_sampai + "\", \"" + item.pak_nama_pengirim + "\", \"" + item.pak_status + "\")'>" +
+                                "<i class='fas fa-info-circle'></i></a>" +
+                                "</td>" +
+                                "</tr>";
+
+                            $('#tbody').append(newRow);
+                        });
+
+                        // Attach click event to delete buttons
+                        $('.delete-btn').click(function () {
+                            var pakId = $(this).data('pak-id');
+                            confirmDelete(pakId);
+                        });
+                    },
+                });
+            }
+
+            function confirmDelete(pakId) {
+                var confirmation = confirm("Apakah Anda yakin ingin menghapus data?");
+                if (confirmation) {
+                    hapus(pakId);
+                }
+            }
+
+            function hapus(pakId) {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "DeletePaket?pak_id=" + pakId;
+                var method = "DELETE";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert("Data Berhasil Dihapus");
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Gagal menghapus data. Cek konsol untuk detailnya.");
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            // Fungsi untuk menampilkan detail
+            function showDetail(id, namaPemilik, idJenis, tanggalPaket, namaPengirim, status) {
+                $('#detailPakId').text(id);
+                $('#detailPakNamaPemilik').text(namaPemilik);
+                $('#detailPakIdJenis').text(idJenis);
+                $('#detailPakTanggal').text(tanggalPaket);
+                $('#detailPakNamaPengirim').text(namaPengirim);
+                $('#detailPakStatus').text(status);
+
+                $('#detailModal').modal('show');
+            }
+
+            // Fungsi untuk menyimpan perubahan pada modal update
+            function edit() {
+                var pakId = document.getElementById("updatePakId").value;
+                var pakNamaPemilik = document.getElementById("updatePakNamaPemilik").value;
+                var pakIdJenis = document.getElementById("updatePakIdJenis").value;
+                var pakTanggal = document.getElementById("updatePakTanggal").value;
+                var pakNamaPengirim = document.getElementById("updatePakNamaPengirim").value;
+                var pakStatus = document.getElementById("updatePakStatus").value;
+
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "UpdatePaket";
+                var method = "PUT";
+
+                var input = {
+                    pak_id: pakId,
+                    pak_nama_pemilik: pakNamaPemilik,
+                    pak_id_jenis: pakIdJenis,
+                    pak_tanggal_sampai: pakTanggal,
+                    pak_nama_pengirim: pakNamaPengirim,
+                    pak_status: pakStatus
+                };
+
+                var data = JSON.stringify(input);
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    data: data,
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert("Data Berhasil Diupdate");
+                        location.reload();
+                    },
+                });
+            }
+
+
+
+            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket
+            function populateJenisPaketDropdown() {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetAllJenisPaket";
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var jenisPaketList = data.data;
+
+                        // Kosongkan terlebih dahulu dropdown list
+                        $('#pak_id_jenis').empty();
+
+                        // Tambahkan opsi dari data ms_jenispaket
+                        jenisPaketList.forEach(function (item) {
+                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
+                        });
+                    },
+                });
+            }
+
+
+            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket
+            function populateJenisPaketDropdown() {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetAllJenisPaket";
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var jenisPaketList = data.data;
+
+                        // Kosongkan terlebih dahulu dropdown list
+                        $('#updatePakIdJenis').empty();
+
+                        jenisPaketList.forEach(function (item) {
+                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
+                        });
+                    },
+                });
+            }
+
+            // Panggil fungsi untuk mengisi dropdown list saat halaman dimuat
+            $(document).ready(function () {
+                populateJenisPaketDropdown();
+            });
+
+
+
+            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket pada formulir create
+            function populateJenisPaketDropdownCreate() {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetAllJenisPaket";
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var jenisPaketList = data.data;
+
+                        // Kosongkan terlebih dahulu dropdown list
+                        $('#pak_id_jenis').empty();
+
+                        // Tambahkan opsi dari data ms_jenispaket ke dropdown list
+                        jenisPaketList.forEach(function (item) {
+                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
+                        });
+                    },
+                });
+            }
+
+            // Panggil fungsi untuk mengisi dropdown list saat halaman dimuat
+            $(document).ready(function () {
+                populateJenisPaketDropdownCreate();
+            });
+        </script>
