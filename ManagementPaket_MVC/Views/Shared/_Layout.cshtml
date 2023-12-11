@@ -54,41 +54,41 @@
     $("#menuClose").css({ "cursor": "pointer", "display": "none" });
     }
     }
+    <script>
+            function updateLastLogin() {
+                var lastLoginElement = document.getElementById("lastLogin");
+                if (lastLoginElement) {
+                    var currentDateTime = new Date();
 
-    function updateLastLogin() {
-    var lastLoginElement = document.getElementById("lastLogin");
-    if (lastLoginElement) {
-    var currentDateTime = new Date();
+                    var namaBulan = [
+                        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ];
 
-    var namaBulan = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
+                    var options = {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
 
-    var options = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
+                    };
 
-    };
+                    var formattedCurrentDateTime = currentDateTime.toLocaleDateString('id-ID', options);
 
-    var formattedCurrentDateTime = currentDateTime.toLocaleDateString('id-ID', options);
+                    var bulanIndex = currentDateTime.getMonth();
+                    var splitFormattedDateTime = formattedCurrentDateTime.split('/');
+                    splitFormattedDateTime[1] = namaBulan[bulanIndex];
 
-    var bulanIndex = currentDateTime.getMonth();
-    var splitFormattedDateTime = formattedCurrentDateTime.split('/');
-    splitFormattedDateTime[1] = namaBulan[bulanIndex];
+                    var updatedFormattedDateTime = splitFormattedDateTime.join(' ');
 
-    var updatedFormattedDateTime = splitFormattedDateTime.join(' ');
+                    lastLoginElement.innerHTML = updatedFormattedDateTime + ' WIB';
+                }
+            }
 
-    lastLoginElement.innerHTML = updatedFormattedDateTime + ' WIB';
-    }
-    }
+        updateLastLogin();
 
-    updateLastLogin();
-
-    setInterval(updateLastLogin, 1000);
+        setInterval(updateLastLogin, 1000);
 
     </script>
 

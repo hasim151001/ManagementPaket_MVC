@@ -1,4 +1,4 @@
-﻿@*
+﻿﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -32,7 +32,8 @@
                     <table class="table table-sm table-hover table-bordered table-striped" cellspacing="0" rules="all" border="1" id="MainContent_gridData" style="width:100%;border-collapse:collapse;">
                         <thead>
                             <tr>
-                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">ID  Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">No</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Kode  Paket</th>
                                 <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Pemilik Paket</th>
                                 <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Jenis Paket</th>
                                 <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Tanggal Paket</th>
@@ -142,12 +143,12 @@
                     </div>
                     <div class="modal-body">
                         <p><strong>ID Paket:</strong> <span id="detailPakId"></span></p>
+                        <p><strong>Kode Paket:</strong> <span id="detailPakIdAlternatif"></span></p>
                         <p><strong>Nama Pemilik Paket:</strong> <span id="detailPakNamaPemilik"></span></p>
                         <p><strong>ID Jenis Paket:</strong> <span id="detailPakIdJenis"></span></p>
                         <p><strong>Tanggal Sampai:</strong> <span id="detailPakTanggal"></span></p>
                         <p><strong>Nama Pengirim Paket:</strong> <span id="detailPakNamaPengirim"></span></p>
                         <p><strong>Status Paket:</strong> <span id="detailPakStatus"></span></p>
-                        <!-- Tambahkan informasi lainnya sesuai kebutuhan -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -163,15 +164,33 @@
 
 
         <script>
-            loadTable();
-            function showUpdateModal(id, namaPemilik, idJenis, tanggalPaket, namaPengirim, status) {
+            loadTable()
+            // Fungsi untuk menampilkan detail
+            function showDetail(pak_id, pak_id_alternatif, pak_nama_pemilik, pak_id_jenis, pak_tanggal_sampai, pak_nama_pengirim, pak_status) {
+                console.log('showDetail called:', pak_id, pak_id_alternatif, pak_nama_pemilik, pak_id_jenis, pak_tanggal_sampai, pak_nama_pengirim, pak_status);
+
+                // Log nilai pak_id_alternatif
+                console.log('pak_id_alternatif:', pak_id_alternatif)
+                var statusText = (pak_status == 1) ? "Belum Diambil" : "Sudah Diambil";
+                $('#detailPakId').text(pak_id)
+                $('#detailPakIdAlternatif').text(pak_id_alternatif)
+                $('#detailPakNamaPemilik').text(pak_nama_pemilik)
+                $('#detailPakIdJenis').text(pak_id_jenis)
+                $('#detailPakTanggal').text(pak_tanggal_sampai)
+                $('#detailPakNamaPengirim').text(pak_nama_pengirim)
+                $('#detailPakStatus').text(statusText)
+                $('#detailModal').modal('show')
+            }
+
+            function showUpdateModal(pak_id, pak_id_alternatif, pak_nama_pemilik, pak_id_jenis, pak_tanggal_sampai, pak_nama_pengirim, pak_status) {
                 // Menetapkan nilai input modal update
-                $('#updatePakId').val(id);
-                $('#updatePakNamaPemilik').val(namaPemilik);
-                $('#updatePakIdJenis').val(idJenis);
-                $('#updatePakTanggalSampai').val(tanggalPaket);
-                $('#updatePakNamaPengirim').val(namaPengirim);
-                $('#updatePakStatus').val(status);
+                $('#updatePakId').val(pak_id);
+                $('#detailPakIdAlternatif').val(pak_id_alternatif);
+                $('#updatePakNamaPemilik').val(pak_nama_pemilik);
+                $('#updatePakIdJenis').val(pak_id_jenis);
+                $('#updatePakTanggalSampai').val(pak_tanggal_sampai);
+                $('#updatePakNamaPengirim').val(pak_nama_pengirim);
+                $('#updatePakStatus').val(pak_status);
 
                 // Memanggil fungsi untuk mengisi dropdown list
                 populateJenisPaketDropdown();  // Pastikan panggilan ini dijalankan pada waktu yang tepat
@@ -180,10 +199,9 @@
             }
 
 
-
             function loadTable() {
                 var hostname = "https://localhost:7120/";
-                var url = hostname + "GetAllPaket";
+                var url = hostname + "GetView";
                 var method = "GET";
 
                 $.ajax({
@@ -195,24 +213,26 @@
 
                         $('#tbody').empty();
 
-                        paketList.forEach(function (item) {
+                        paketList.forEach(function (item, index) {
+                            var statusText = (item.pak_status == 1) ? "Belum Diambil" : "Non-Aktif";
                             var newRow = "<tr>" +
-                                "<td class='text-center'>" + item.pak_id + "</td>" +
+                                "<td class='text-center'>" + (index + 1) + "</td>" +
+                                "<td class='text-center'>" + item.pak_id_alternatif + "</td>" +
                                 "<td>" + item.pak_nama_pemilik + "</td>" +
-                                "<td class='text-center'>" + item.pak_id_jenis + "</td>" +
+                                "<td class='text-center'>" + item.pak_nama_jenis + "</td>" +
                                 "<td>" + item.pak_tanggal_sampai + "</td>" +
                                 "<td>" + item.pak_nama_pengirim + "</td>" +
-                                "<td>" + item.pak_status + "</td>" +
+                                "<td>" + statusText + "</td>" +
                                 "<td class='text-center'>" +
                                 "<a data-toggle='modal' data-target='#updateModal' data-backdrop='false' " +
-                                "onclick='showUpdateModal(\"" + item.pak_id + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_id_jenis + "\", " +
+                                "onclick='showUpdateModal(\"" + item.pak_id + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_nama_jenis + "\", " +
                                 "\"" + item.pak_tanggal_sampai + "\", \"" + item.pak_nama_pengirim + "\", \"" + item.pak_status + "\")'>" +
                                 "<i class='fas fa-edit'></i></a>" +
                                 "&nbsp;&nbsp;&nbsp;" +
                                 "<a href='#' class='delete-btn' data-pak-id='" + item.pak_id + "'><i class='fas fa-trash'></i></a>" +
                                 "&nbsp;&nbsp;&nbsp;" +
                                 "<a data-toggle='modal' data-target='#detailModal' data-backdrop='false' " +
-                                "onclick='showDetail(\"" + item.pak_id + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_id_jenis + "\", " +
+                                "onclick='showDetail(\"" + item.pak_id + "\", \"" + item.pak_id_alternatif + "\", \"" + item.pak_nama_pemilik + "\", \"" + item.pak_nama_jenis + "\", " +
                                 "\"" + item.pak_tanggal_sampai + "\", \"" + item.pak_nama_pengirim + "\", \"" + item.pak_status + "\")'>" +
                                 "<i class='fas fa-info-circle'></i></a>" +
                                 "</td>" +
@@ -227,8 +247,12 @@
                             confirmDelete(pakId);
                         });
                     },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
                 });
             }
+
 
             function confirmDelete(pakId) {
                 var confirmation = confirm("Apakah Anda yakin ingin menghapus data?");
@@ -257,20 +281,11 @@
                 });
             }
 
-            // Fungsi untuk menampilkan detail
-            function showDetail(id, namaPemilik, idJenis, tanggalPaket, namaPengirim, status) {
-                $('#detailPakId').text(id);
-                $('#detailPakNamaPemilik').text(namaPemilik);
-                $('#detailPakIdJenis').text(idJenis);
-                $('#detailPakTanggal').text(tanggalPaket);
-                $('#detailPakNamaPengirim').text(namaPengirim);
-                $('#detailPakStatus').text(status);
 
-                $('#detailModal').modal('show');
-            }
             // Fungsi untuk menyimpan perubahan pada modal update
             function Edit() {
                 var pak_id = document.getElementById("updatePakId").value
+                // var pak_id_alternatif = document.getElementById("updatePakKode").value
                 var pak_nama_pemilik = document.getElementById("updatePakNamaPemilik").value
                 var pak_id_jenis = document.getElementById("updatePakIdJenis").value // Perhatikan perubahan di sini
                 //var pak_tanggal_sampai = document.getElementById("updatePakTanggal").value
@@ -283,6 +298,7 @@
 
                 var input = {
                     pak_id: pak_id,
+                    // pak_id_alternatif: pak_id_alternatif,
                     pak_nama_pemilik: pak_nama_pemilik,
                     pak_id_jenis: pak_id_jenis,
                     // pak_tanggal_sampai: pak_tanggal_sampai,

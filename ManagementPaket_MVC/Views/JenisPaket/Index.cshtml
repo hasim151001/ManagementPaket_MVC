@@ -1,4 +1,4 @@
-﻿@*
+﻿﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -32,8 +32,9 @@
                     <table class="table table-sm table-hover table-bordered table-striped" cellspacing="0" rules="all" border="1" id="MainContent_gridData" style="width:100%;border-collapse:collapse;">
                         <thead>
                             <tr>
-                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">ID Jenis Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">No</th>
                                 <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Nama Jenis Paket</th>
+                                <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Status Jenis Paket</th>
                                 <th class="text-center" style="background-color: #4285f4; color:white; font-weight:bold">Aksi</th>
                             </tr>
                         </thead>
@@ -112,8 +113,9 @@
                         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong>ID Jenis Paket:</strong> <span id="detailPakId"></span></p>
                         <p><strong>Nama Jenis Paket:</strong> <span id="detailPakNama"></span></p>
+                        <p><strong>Status Jenis Paket:</strong> <span id="detailPakStatus"></span></p>
+
                         <!-- Tambahkan informasi lainnya sesuai kebutuhan -->
                     </div>
                     <div class="modal-footer">
@@ -136,10 +138,11 @@
 <script>
     loadTable()
 
-    function showUpdateModal(id_jenis, nama_jenis) {
+    function showUpdateModal(id_jenis, nama_jenis, status_jenis) {
         // Menetapkan nilai nama_jenis ke input atau elemen modal yang sesuai
         $('#updatePakNama').val(nama_jenis);
         $('#updatePakId').val(id_jenis);
+        $('#updatePakStatus').val(status_jenis);
 
         // Menampilkan modal update
         $('#updateModal').modal('show');
@@ -159,18 +162,23 @@
 
                 $('#tbody').empty();
 
-                jenisPaketList.forEach(function (item) {
+                jenisPaketList.forEach(function (item, index) {
+                    var statusText = (item.pak_status_jenis == 1) ? "Aktif" : "Non-Aktif";
+
                     var newRow = "<tr>" +
-                        "<td class='text-center'>" + item.pak_id_jenis + "</td>" +
+                        "<td class='text-center'>" + (index + 1) + "</td>" +
                         "<td>" + item.pak_nama_jenis + "</td>" +
+                        "<td>" + statusText + "</td>" +
                         "<td class='text-center'>" +
-                        "<a data-toggle='modal' data-target='#updateModal' data-backdrop='false' onclick='showUpdateModal(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\")'><i class='fas fa-edit'></i></a>" +
+                        "<a data-toggle='modal' data-target='#updateModal' data-backdrop='false' onclick='showUpdateModal(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\", \"" + item.pak_status_jenis + "\")'><i class='fas fa-edit'></i></a>" +
                         "&nbsp;&nbsp;&nbsp;" +
                         "<a href='#' class='delete-btn' data-pak-id='" + item.pak_id_jenis + "'><i class='fas fa-trash'></i></a>" +
                         "&nbsp;&nbsp;&nbsp;" +
-                        "<a data-toggle='modal' data-target='#detailModal' data-backdrop='false' href='#' onclick='showDetail(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\")'><i class='fas fa-info-circle'></i></a>" +
+                        "<a data-toggle='modal' data-target='#detailModal' data-backdrop='false' href='#' onclick='showDetail(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\", \"" + item.pak_status_jenis + "\")'><i class='fas fa-info-circle'></i></a>" +
                         "</td>" +
                         "</tr>";
+
+
 
                     $('#tbody').append(newRow);
                 });
@@ -267,13 +275,16 @@
         });
     }
 
+    function showDetail(pak_id_jenis, pak_nama_jenis, pak_status_jenis) {
+        console.log('showDetail called:', pak_id_jenis, pak_nama_jenis, pak_status_jenis)
+        var statusText = (pak_status_jenis == 1) ? "Aktif" : "Non-Aktif";
 
-    function showDetail(pak_id_jenis, pak_nama_jenis) {
-        console.log('showDetail called:', pak_id_jenis, pak_nama_jenis)
         $('#detailPakId').text(pak_id_jenis)
         $('#detailPakNama').text(pak_nama_jenis)
+        $('#detailPakStatus').text(statusText)
         $('#detailModal').modal('show')
     }
+
 
 
     function loadDataForUpdate(pak_id_jenis) {
@@ -323,5 +334,70 @@
     }
 
 
-</script>
 
+
+
+    // Menambahkan event listener untuk keypress pada textbox pencarian
+    $("#MainContent_txtCari").on('keypress', function (e) {
+        // Mengecek apakah tombol Enter ditekan (kode 13)
+        if (e.which == 13) {
+            // Memanggil fungsi pencarian
+            cariData();
+        }
+    });
+
+    // Fungsi pencarian data
+    function cariData() {
+        // Mendapatkan nilai teks dari textbox pencarian
+        var keyword = $("#MainContent_txtCari").val();
+
+        // Memanggil fungsi untuk memuat tabel dengan parameter pencarian nama
+        loadTableWithSearch(keyword);
+    }
+
+    // Fungsi untuk memuat tabel dengan parameter pencarian nama
+    function loadTableWithSearch(pak_nama_jenis) {
+        var hostname = "https://localhost:7120/";
+        var url = hostname + "GetAllJenisPaket?nama=" + encodeURIComponent(pak_nama_jenis);
+        var method = "GET";
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: "application/json",
+            success: function (data) {
+                var jenisPaketList = data.data;
+
+                $('#tbody').empty();
+
+                jenisPaketList.forEach(function (item, index) {
+                    var statusText = (item.pak_status_jenis == 1) ? "Aktif" : "Non-Aktif";
+
+                    var newRow = "<tr>" +
+                        "<td class='text-center'>" + (index + 1) + "</td>" +
+                        "<td>" + item.pak_nama_jenis + "</td>" +
+                        "<td>" + statusText + "</td>" +
+                        "<td class='text-center'>" +
+                        "<a data-toggle='modal' data-target='#updateModal' data-backdrop='false' onclick='showUpdateModal(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\", \"" + item.pak_status_jenis + "\")'><i class='fas fa-edit'></i></a>" +
+                        "&nbsp;&nbsp;&nbsp;" +
+                        "<a href='#' class='delete-btn' data-pak-id='" + item.pak_id_jenis + "'><i class='fas fa-trash'></i></a>" +
+                        "&nbsp;&nbsp;&nbsp;" +
+                        "<a data-toggle='modal' data-target='#detailModal' data-backdrop='false' href='#' onclick='showDetail(\"" + item.pak_id_jenis + "\", \"" + item.pak_nama_jenis + "\", \"" + item.pak_status_jenis + "\")'><i class='fas fa-info-circle'></i></a>" +
+                        "</td>" +
+                        "</tr>";
+
+                    $('#tbody').append(newRow);
+                });
+
+                // Attach click event to delete buttons
+                $('.delete-btn').click(function () {
+                    var pakId = $(this).data('pak-id');
+                    confirmDelete(pakId);
+                });
+            },
+        });
+    }
+
+    // Memanggil fungsi loadTable saat halaman pertama kali dimuat
+    loadTable();
+</script>

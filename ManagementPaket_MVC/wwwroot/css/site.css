@@ -19,5 +19,5 @@ body {
 
 .modal {
     background: rgba(0, 0, 0, 0.7);
-    opacity: 1.0; /* Sesuaikan dengan tingkat opacity yang diinginkan  */
+    opacity: 3.0; /* Sesuaikan dengan tingkat opacity yang diinginkan  */
 }
