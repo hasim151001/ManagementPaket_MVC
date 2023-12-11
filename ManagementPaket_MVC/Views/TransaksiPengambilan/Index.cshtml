@@ -182,9 +182,7 @@
             }
 
             function showUpdateModal(pak_id, pak_nama_pemilik, pak_nama_jenis, pak_tanggal_sampai, pak_nama_pengirim) {
-
                 $('#updatePakId').val(pak_id);
-
                 $('#updatePakNamaPemilik').val(pak_nama_pemilik);
                 $('#updatePakIdJenis').val(pak_nama_jenis);
 
@@ -218,7 +216,7 @@
                         $('#tbody').empty();
 
                         paketList.forEach(function (item, index) {
-                            var statusText = (item.pak_status === 1) ? "Belum Diambil" : "Non-Aktif";
+                            var statusText = (item.pak_status == 1) ? "Belum Diambil" : "Non-Aktif";
                             var newRow = "<tr>" +
                                 "<td class='text-center'>" + (index + 1) + "</td>" +
                                 "<td class='text-center'>" + item.pak_id_alternatif + "</td>" +
@@ -287,43 +285,39 @@
 
 
             function Edit() {
-                var pak_id = document.getElementById("updatePakId").value;
-                var pak_nama_pemilik = document.getElementById("updatePakNamaPemilik").value;
-                var pak_id_jenis = document.getElementById("updatePakIdJenis").value;
-                var pak_nama_pengirim = document.getElementById("updatePakNamaPengirim").value;
+                var pak_id = document.getElementById("updatePakId").value
+                var pak_nama_pemilik = document.getElementById("updatePakNamaPemilik").value
+                var pak_id_jenis = document.getElementById("updatePakIdJenis").value
+                var pak_nama_pengirim = document.getElementById("updatePakNamaPengirim").value
 
-                console.log(pak_id);
-                console.log(pak_nama_pemilik);
-                console.log(pak_id_jenis);
-                console.log(pak_nama_pengirim);
-
-                var hostname = "https://localhost:7120/";
-                var url = hostname + "UpdatePaket";
-                var method = "PUT";
+                var hostname = "https://localhost:7120/"
+                var url = hostname + "UpdatePaket"
+                var method = "PUT"
 
                 var input = {
                     pak_id: pak_id,
+                    pak_id_alternatif: '',
                     pak_nama_pemilik: pak_nama_pemilik,
                     pak_id_jenis: pak_id_jenis,
                     pak_nama_pengirim: pak_nama_pengirim,
-                    pak_id_alternatif: 'PKT002',
-                    pak_nama_jenis: 'Test',
-                };
+                    pak_nama_jenis: '',
+                }
+                var data = JSON.stringify(input)
 
                 $.ajax({
                     url: url,
                     method: method,
-                    data: JSON.stringify(input), // Convert input to JSON string
+                    data: data,
                     contentType: "application/json",
                     success: function (data) {
-                        alert("Data Berhasil Diupdate");
+                        alert("Data Berhasil Diupdate")
                         window.location.href = '/Paket/Index';
+
                     },
-                    error: function (xhr, status, error) {
-                        alert("Gagal mengupdate data. Cek konsol untuk detailnya." + xhr.responseText);
-                    }
                 });
             }
+
+
 
             function loadDataForUpdate(pak_id) {
                 var hostname = "https://localhost:7120/";
