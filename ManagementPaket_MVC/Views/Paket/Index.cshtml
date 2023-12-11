@@ -142,10 +142,9 @@
                         <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p><strong>ID Paket:</strong> <span id="detailPakId"></span></p>
                         <p><strong>Kode Paket:</strong> <span id="detailPakIdAlternatif"></span></p>
                         <p><strong>Nama Pemilik Paket:</strong> <span id="detailPakNamaPemilik"></span></p>
-                        <p><strong>ID Jenis Paket:</strong> <span id="detailPakIdJenis"></span></p>
+                        <p><strong>Jenis Paket:</strong> <span id="detailPakIdJenis"></span></p>
                         <p><strong>Tanggal Sampai:</strong> <span id="detailPakTanggal"></span></p>
                         <p><strong>Nama Pengirim Paket:</strong> <span id="detailPakNamaPengirim"></span></p>
                         <p><strong>Status Paket:</strong> <span id="detailPakStatus"></span></p>
@@ -172,7 +171,7 @@
                 // Log nilai pak_id_alternatif
                 console.log('pak_id_alternatif:', pak_id_alternatif)
                 var statusText = (pak_status == 1) ? "Belum Diambil" : "Sudah Diambil";
-                $('#detailPakId').text(pak_id)
+                //$('#detailPakId').text(pak_id)
                 $('#detailPakIdAlternatif').text(pak_id_alternatif)
                 $('#detailPakNamaPemilik').text(pak_nama_pemilik)
                 $('#detailPakIdJenis').text(pak_id_jenis)
@@ -182,21 +181,23 @@
                 $('#detailModal').modal('show')
             }
 
-            function showUpdateModal(pak_id, pak_id_alternatif, pak_nama_pemilik, pak_id_jenis, pak_tanggal_sampai, pak_nama_pengirim, pak_status) {
-                // Menetapkan nilai input modal update
-                $('#updatePakId').val(pak_id);
-                $('#detailPakIdAlternatif').val(pak_id_alternatif);
+            function showUpdateModal(pak_id, pak_nama_pemilik, pak_nama_jenis, pak_tanggal_sampai, pak_nama_pengirim) {
                 $('#updatePakNamaPemilik').val(pak_nama_pemilik);
-                $('#updatePakIdJenis').val(pak_id_jenis);
-                $('#updatePakTanggalSampai').val(pak_tanggal_sampai);
+                $('#updatePakIdJenis').val(pak_nama_jenis);
+
+                // Ubah format tanggal jika diperlukan
+                var formattedDate = new Date(pak_tanggal_sampai).toISOString().split('T')[0];
+                $('#updatePakTanggalSampai').val(formattedDate);
+
                 $('#updatePakNamaPengirim').val(pak_nama_pengirim);
-                $('#updatePakStatus').val(pak_status);
 
                 // Memanggil fungsi untuk mengisi dropdown list
-                populateJenisPaketDropdown();  // Pastikan panggilan ini dijalankan pada waktu yang tepat
+                populateJenisPaketDropdownEdit();
+
                 // Menampilkan modal update
                 $('#updateModal').modal('show');
             }
+
 
 
             function loadTable() {
@@ -282,31 +283,23 @@
             }
 
 
-            // Fungsi untuk menyimpan perubahan pada modal update
             function Edit() {
                 var pak_id = document.getElementById("updatePakId").value
-                // var pak_id_alternatif = document.getElementById("updatePakKode").value
                 var pak_nama_pemilik = document.getElementById("updatePakNamaPemilik").value
-                var pak_id_jenis = document.getElementById("updatePakIdJenis").value // Perhatikan perubahan di sini
-                //var pak_tanggal_sampai = document.getElementById("updatePakTanggal").value
+                var pak_id_jenis = document.getElementById("updatePakIdJenis").value
                 var pak_nama_pengirim = document.getElementById("updatePakNamaPengirim").value
-                // var pak_status = document.getElementById("updatePakStatus").value
 
-                var hostname = "https://localhost:7120/";
-                var url = hostname + "UpdatePaket";
-                var method = "PUT";
+                var hostname = "https://localhost:7120/"
+                var url = hostname + "UpdatePaket"
+                var method = "PUT"
 
                 var input = {
                     pak_id: pak_id,
-                    // pak_id_alternatif: pak_id_alternatif,
                     pak_nama_pemilik: pak_nama_pemilik,
                     pak_id_jenis: pak_id_jenis,
-                    // pak_tanggal_sampai: pak_tanggal_sampai,
                     pak_nama_pengirim: pak_nama_pengirim,
-                    // pak_status: pak_status,
-                };
-
-                var data = JSON.stringify(input)
+                }
+                        var data = JSON.stringify(input)
 
                 $.ajax({
                     url: url,
@@ -314,20 +307,26 @@
                     data: data,
                     contentType: "application/json",
                     success: function (data) {
-                        alert("Data Berhasil Diupdate")
-                        window.location.href = '/Paket/Index';
+                        if (data.status === 200) {
+                            alert("Data Berhasil Diupdate");
+                            window.location.reload();
+                        } else {
+                            alert("Gagal mengupdate data. Cek konsol untuk detailnya.");
+                            console.error(data);
+                        }
                     },
-
+                    error: function (xhr, status, error) {
+                        alert("Terjadi kesalahan pada server. Cek konsol untuk detailnya.");
+                        console.error(xhr.responseText);
+                    }
                 });
             }
 
-            // Panggil fungsi untuk mengisi dropdown list saat modal update ditampilkan
-            $('#updateModal').on('shown.bs.modal', function () {
-                populateJenisPaketDropdownEdit();
-            });
+
+
             function loadDataForUpdate(pak_id) {
                 var hostname = "https://localhost:7120/";
-                var url = hostname + "GetJenisPaket?pak_id=" + pak_id;
+                var url = hostname + "GetPaket?pak_id=" + pak_id;
                 var method = "GET";
 
                 $.ajax({
@@ -346,10 +345,10 @@
                 });
             }
 
-
+            //-------------------------------------------------------------------------------------------------
             function showUpdate(pak_id, pak_nama_pemilik, pak_id_jenis, pak_nama_pengirim) {
-                console.log('showUpdate called:', pak_id, pak_nama_pemilik, pak_nama_pengirim)
-                $('#updatePakId').text(pak_id);
+                console.log('showUpdate called:', pak_id, pak_nama_pemilik, pak_id_jenis, pak_nama_pengirim)
+                // $('#updatePakId').text(pak_id);
                 $('#updatePakNamaPemilik').text(pak_nama_pemilik);
                 $('#updatePakIdJenis').text(pak_id_jenis);
                 $('#updatePakNamaPengirim').text(pak_nama_pengirim);
