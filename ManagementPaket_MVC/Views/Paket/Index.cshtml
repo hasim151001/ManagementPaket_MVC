@@ -268,30 +268,29 @@
 
                 $('#detailModal').modal('show');
             }
-
             // Fungsi untuk menyimpan perubahan pada modal update
-            function edit() {
-                var pakId = document.getElementById("updatePakId").value;
-                var pakNamaPemilik = document.getElementById("updatePakNamaPemilik").value;
-                var pakIdJenis = document.getElementById("updatePakIdJenis").value;
-                var pakTanggal = document.getElementById("updatePakTanggal").value;
-                var pakNamaPengirim = document.getElementById("updatePakNamaPengirim").value;
-                var pakStatus = document.getElementById("updatePakStatus").value;
+            function Edit() {
+                var pak_id = document.getElementById("updatePakId").value
+                var pak_nama_pemilik = document.getElementById("updatePakNamaPemilik").value
+                var pak_id_jenis = document.getElementById("updatePakIdJenis").value // Perhatikan perubahan di sini
+                //var pak_tanggal_sampai = document.getElementById("updatePakTanggal").value
+                var pak_nama_pengirim = document.getElementById("updatePakNamaPengirim").value
+                // var pak_status = document.getElementById("updatePakStatus").value
 
                 var hostname = "https://localhost:7120/";
                 var url = hostname + "UpdatePaket";
                 var method = "PUT";
 
                 var input = {
-                    pak_id: pakId,
-                    pak_nama_pemilik: pakNamaPemilik,
-                    pak_id_jenis: pakIdJenis,
-                    pak_tanggal_sampai: pakTanggal,
-                    pak_nama_pengirim: pakNamaPengirim,
-                    pak_status: pakStatus
+                    pak_id: pak_id,
+                    pak_nama_pemilik: pak_nama_pemilik,
+                    pak_id_jenis: pak_id_jenis,
+                    // pak_tanggal_sampai: pak_tanggal_sampai,
+                    pak_nama_pengirim: pak_nama_pengirim,
+                    // pak_status: pak_status,
                 };
 
-                var data = JSON.stringify(input);
+                var data = JSON.stringify(input)
 
                 $.ajax({
                     url: url,
@@ -299,68 +298,72 @@
                     data: data,
                     contentType: "application/json",
                     success: function (data) {
-                        alert("Data Berhasil Diupdate");
-                        location.reload();
+                        alert("Data Berhasil Diupdate")
+                        window.location.href = '/Paket/Index';
                     },
+
                 });
             }
 
-
-
-            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket
-            function populateJenisPaketDropdown() {
-                var hostname = "https://localhost:7120/";
-                var url = hostname + "GetAllJenisPaket";
-                var method = "GET";
-
-                $.ajax({
-                    url: url,
-                    method: method,
-                    contentType: "application/json",
-                    success: function (data) {
-                        var jenisPaketList = data.data;
-
-                        // Kosongkan terlebih dahulu dropdown list
-                        $('#pak_id_jenis').empty();
-
-                        // Tambahkan opsi dari data ms_jenispaket
-                        jenisPaketList.forEach(function (item) {
-                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
-                        });
-                    },
-                });
-            }
-
-
-            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket
-            function populateJenisPaketDropdown() {
-                var hostname = "https://localhost:7120/";
-                var url = hostname + "GetAllJenisPaket";
-                var method = "GET";
-
-                $.ajax({
-                    url: url,
-                    method: method,
-                    contentType: "application/json",
-                    success: function (data) {
-                        var jenisPaketList = data.data;
-
-                        // Kosongkan terlebih dahulu dropdown list
-                        $('#updatePakIdJenis').empty();
-
-                        jenisPaketList.forEach(function (item) {
-                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
-                        });
-                    },
-                });
-            }
-
-            // Panggil fungsi untuk mengisi dropdown list saat halaman dimuat
-            $(document).ready(function () {
-                populateJenisPaketDropdown();
+            // Panggil fungsi untuk mengisi dropdown list saat modal update ditampilkan
+            $('#updateModal').on('shown.bs.modal', function () {
+                populateJenisPaketDropdownEdit();
             });
+            function loadDataForUpdate(pak_id) {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetJenisPaket?pak_id=" + pak_id;
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var item = data.data;
+
+                        // Mengatur nilai input di modal update
+                        $('#update_pak_nama_pemilik').val(item.pak_nama_pemilik);
+                        $('#update_pak_id_jenis').val(item.pak_id_jenis);
+                        $('#update_pak_nama_pengirim').val(item.pak_nama_pengirim);
+
+                    },
+                });
+            }
 
 
+            function showUpdate(pak_id, pak_nama_pemilik, pak_id_jenis, pak_nama_pengirim) {
+                console.log('showUpdate called:', pak_id, pak_nama_pemilik, pak_nama_pengirim)
+                $('#updatePakId').text(pak_id);
+                $('#updatePakNamaPemilik').text(pak_nama_pemilik);
+                $('#updatePakIdJenis').text(pak_id_jenis);
+                $('#updatePakNamaPengirim').text(pak_nama_pengirim);
+
+                $('#updateModal').modal('show');
+
+                // Memuat data untuk update saat modal ditampilkan
+                loadDataForUpdate(pak_id);
+            }
+
+            function loadDataForUpdate(pak_id) {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetPaket?pak_id=" + pak_id;
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        var item = data.data;
+
+                        // Mengatur nilai input di modal update
+                        $('#updatePakNamaPemilik').val(item.pak_nama_pemilik);
+                        $('#updatePakIdJenis').val(item.pak_id_jenis);
+                        $('#updatePakNamaPengirim').val(item.pak_nama_pengirim);
+
+                    },
+                });
+            }
 
             // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket pada formulir create
             function populateJenisPaketDropdownCreate() {
@@ -373,14 +376,15 @@
                     method: method,
                     contentType: "application/json",
                     success: function (data) {
+                        console.log(data); // Tambahkan ini untuk melihat data yang diterima di konsol
                         var jenisPaketList = data.data;
 
-                        // Kosongkan terlebih dahulu dropdown list
-                        $('#pak_id_jenis').empty();
+                        // Kosongkan terlebih dahulu dropdown list pada formulir create
+                        $('pak_id_jenis').empty();
 
-                        // Tambahkan opsi dari data ms_jenispaket ke dropdown list
+                        // Tambahkan opsi dari data ms_jenispaket ke dropdown list pada formulir create
                         jenisPaketList.forEach(function (item) {
-                            $('#updatePakIdJenis').append('<option value="' + item.id_jenis + '">' + item.nama_jenis + '</option>');
+                            $('#pak_id_jenis').append('<option value="' + item.pak_id_jenis + '">' + item.pak_nama_jenis + '</option>');
                         });
                     },
                 });
@@ -390,4 +394,70 @@
             $(document).ready(function () {
                 populateJenisPaketDropdownCreate();
             });
+
+            function simpan() {
+                var pak_nama_pemilik = document.getElementById("pak_nama_pemilik").value;
+                var pak_id_jenis = document.getElementById("pak_id_jenis").value;
+                var pak_nama_pengirim = document.getElementById("pak_nama_pengirim").value;
+
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "InsertPaket?" +
+                    "pak_nama_pemilik=" + encodeURIComponent(pak_nama_pemilik) +
+                    "&pak_id_jenis=" + encodeURIComponent(pak_id_jenis) +
+                    "&pak_nama_pengirim=" + encodeURIComponent(pak_nama_pengirim);
+                var method = "POST";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (response) {
+                        if (response.status == 200) {
+                            alert("Data Berhasil Ditambahkan");
+                            // Redirect to the index page of the current controller
+                            window.location.href = '/Paket/Index';
+                        } else {
+                            alert("Gagal menambahkan data. Cek konsol untuk detailnya.");
+                            console.error(response);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Terjadi kesalahan. Cek konsol untuk detailnya.");
+                        console.error(xhr);
+                    }
+                });
+            }
+
+            // Fungsi untuk mengisi dropdown list dari tabel ms_jenispaket pada formulir create
+            function populateJenisPaketDropdownEdit() {
+                var hostname = "https://localhost:7120/";
+                var url = hostname + "GetAllJenisPaket";
+                var method = "GET";
+
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: "application/json",
+                    success: function (data) {
+                        console.log(data); // Tambahkan ini untuk melihat data yang diterima di konsol
+                        var jenisPaketList = data.data;
+
+                        // Kosongkan terlebih dahulu dropdown list pada formulir create
+                        $('pak_id_jenis').empty();
+
+                        // Tambahkan opsi dari data ms_jenispaket ke dropdown list pada formulir create
+                        jenisPaketList.forEach(function (item) {
+                            $('#updatePakIdJenis').append('<option value="' + item.pak_id_jenis + '">' + item.pak_nama_jenis + '</option>');
+                        });
+                    },
+                });
+            }
+
+            // Panggil fungsi untuk mengisi dropdown list saat halaman dimuat
+            $(document).ready(function () {
+                populateJenisPaketDropdownEdit();
+            });
+
+
+
         </script>

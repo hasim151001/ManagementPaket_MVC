@@ -21,6 +21,8 @@ input[type="checkbox"]:not(:checked),
     margin-bottom: 0rem;
 }
 
+
+
 .panelheader {
     padding-top: 10px;
     height: 80px;
@@ -32,7 +34,7 @@ input[type="checkbox"]:not(:checked),
     flex: initial;
     height: 100%;
     position: fixed;
-    z-index: 2;
+    z-index: 1;
     padding: 0px 0px 80px 0px;
     border-right: solid 2px #eee;
     display: initial;
@@ -285,12 +287,12 @@ input[type="checkbox"]:not(:checked),
 }
 
 @media screen and (min-width: 1000px) {
-	.body-background {
-		background-image: url("../Images/IMG_Background.jpg");
-		background-repeat: no-repeat;
-		background-size: 100%;
-	}
-	
+    .body-background {
+        background-image: url("../Images/IMG_Background.jpg");
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+
     .panelmenu {
         display: initial;
         width: 250px;
